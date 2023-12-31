@@ -9,11 +9,13 @@ class App extends React.Component {
     super(props);
     this.state = {
       status: 0,
-      darkMode: true
+      darkMode: true,
+      userInformation: {}
     }
     this.loginPage = this.loginPage.bind(this);
     this.createAccountPage = this.createAccountPage.bind(this);
     this.signInPage = this.signInPage.bind(this);
+    this.createUser = this.createUser.bind(this);
   }
 
   render() {
@@ -50,29 +52,100 @@ class App extends React.Component {
     );
   }
 
-  createAccountPage() {
-    var usernameMessage = "";
-    var passwordMessage = "";
-    var imageSource = "data:image/png;base64,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"
-    const validateUsername = () => {
-      
+  createUser(username, password, bio, photo) {
+
+    //Open a new POST request
+    const request = new XMLHttpRequest();
+    request.open("POST", "/api/create-account", true)
+    request.setRequestHeader("Content-Type", "application/json");
+
+    //Create the request body
+    const body = JSON.stringify({
+      username: username,
+      password: password,
+      bio: bio,
+      photo: photo
+    });
+
+    //Set the onload function
+    request.onload = () => {
+      this.setState({ userInformation: JSON.parse(request.responseText)});
     }
+
+    //Send the request
+    request.send(body);
+  }
+
+  createAccountPage() {
+    const validateUsername = () => {
+      if (document.getElementById("username-input-box").value.length === 0) {
+        document.getElementById("username-warning").innerHTML = "What's your username?";
+        document.getElementById("username-input-box").style.border = "1px solid red";
+      } else if (document.getElementById("username-input-box").value.includes(" ")){
+        document.getElementById("username-warning").innerHTML = "Usernames cannot include spaces."
+        document.getElementById("username-input-box").style.border = "1px solid red";
+      } else {
+        document.getElementById("username-warning").innerHTML = "";
+        document.getElementById("username-input-box").style.border = "1px solid rgb(120, 120, 120)";
+      }
+    }
+
+    const validatePassword = () => {
+      if (document.getElementById("password-input-box").value.length === 0) {
+        document.getElementById("password-warning").innerHTML = "Enter a password.";
+        document.getElementById("password-input-box").style.border = "1px solid red";
+      } else if (document.getElementById("password-input-box").value.includes(" ")) {
+        document.getElementById("password-warning").innerHTML = "Passwords cannot include spaces.";
+        document.getElementById("password-input-box").style.border = "1px solid red";
+      } else {
+        document.getElementById("password-warning").innerHTML = "";
+        document.getElementById("password-input-box").style.border = "1px solid rgb(120, 120, 120)";
+      }
+
+      if (document.getElementById("password-confirm-box").value !== document.getElementById("password-input-box").value) {
+        document.getElementById("password-confirm-warning").innerHTML = "Passwords do not match."
+        document.getElementById("password-confirm-box").style.border = "1px solid red";
+      } else {
+        document.getElementById("password-confirm-warning").innerHTML = "";
+        document.getElementById("password-confirm-box").style.border = "1px solid rgb(120, 120, 120)";
+      }
+    }
+
+    const updatePhoto = () => {
+      document.getElementById("profile-image-preview").src = document.getElementById("photo-input-box").value;
+    }
+
+    const createAccount = () => {
+      validateUsername();
+      validatePassword();
+      this.createUser(
+        document.getElementById('username-input-box').value,
+        document.getElementById('password-input-box').value,
+        document.getElementById('bio-input-box').value,
+        document.getElementById('photo-input-box').value
+      )
+    }
+
     return (
       <div id='create-account-container'>
         <div id='info-container'>
           <h1>Create your account</h1>
-          <label for='username-input-box'>Username</label>
-          <input type='text' id='username-input-box' />
-          <label for ='username-input-box'>{usernameMessage}</label>
-          <label for='password-input-box'>Password</label>
-          <input type='text' id='password-input-box' />
-          <label for='password-input-box'>{passwordMessage}</label>
-          <label for='bio-input-box'>Bio</label>
+          <label htmlFor='username-input-box' className='upper-label'>Username</label>
+          <input type='username' id='username-input-box' onChange={validateUsername}/>
+          <label htmlFor ='username-input-box' id='username-warning' className='warning-label'></label>
+          <label htmlFor='password-input-box' className='upper-label'>Password</label>
+          <input type='password' id='password-input-box' onChange={validatePassword} />
+          <label htmlFor='password-input-box' id='password-warning' className='warning-label'></label>
+          <label htmlFor='password-confirm-box' className='upper-label'>Confirm Password</label>
+          <input type='password' id='password-confirm-box' onChange={validatePassword} />
+          <label htmlFor='password-confirm-box' className='warning-label' id='password-confirm-warning'></label>
+          <label htmlFor='bio-input-box' className='upper-label'>Bio</label>
           <input type='text' id='bio-input-box' />
-          <label for='photo-input-box'>Photo Link</label>
+          <label htmlFor='photo-input-box' className='upper-label' >Photo Link</label>
           <input type='text' id='photo-input-box' />
-          <img src={imageSource} alt="The user's profile picture"></img>
-          <button id='submit-create-account'>Create Account</button>
+          <button id='apply-image-button' onClick={updatePhoto}>Apply</button>
+          <img src="https://t3.ftcdn.net/jpg/00/64/67/80/360_F_64678017_zUpiZFjj04cnLri7oADnyMH0XBYyQghG.jpg" alt="The user's profile" id='profile-image-preview'></img>
+          <button id='submit-create-account' onClick={createAccount}>Create Account</button>
         </div>
       </div>
     )
@@ -83,13 +156,9 @@ class App extends React.Component {
   }
 }
 
-
-
-const root = ReactDOM.createRoot(document.getElementById('root'))
+const root = ReactDOM.createRoot(document.getElementById('sign-in-root'))
 root.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
 )
-
-
