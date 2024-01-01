@@ -10,7 +10,7 @@ const app = express();
 //Connect to database
 const database = new sqlite3.Database('./database.db');
 
-app.use(express.static(path.join(__dirname, 'client/build')));  //Serve static files from the build folder
+app.use(express.static(path.join(__dirname, 'sign-in-page/build')));  //Serve static files from the build folder
 app.use(bodyParser.urlencoded({ extended: false }));  //Use bodyParser for URL-encoded bodies
 app.use(bodyParser.json());  //Use bodyParser for JSON-encoded bodies
 app.use(cors(
@@ -47,9 +47,7 @@ app.post("/api/create-account", function(req, res) {
                         let uniqueID = identifier.join('');
                         database.run(`INSERT INTO Users VALUES('${req.body.username}', '${hash}', '${req.body.bio}', '${req.body.photo}', '${uniqueID}');`);
                         res.json({
-                            username: req.body.username,
-                            profilePicture: req.body.photo,
-                            feed: []
+                            id: uniqueID
                         })
                     }
                 })
@@ -68,9 +66,7 @@ app.get("/api/:username/:password", function(req, res) {
         bcrypt.compare(req.params.password, row.password, (err, result) => {
             if (result) {
                 res.send({ 
-                    username: row.username,
-                    profilePicture: row.photo,
-                    feed: []
+                    id: row.id
                 })
             } else {
                 res.send({ error: "Incorrect Password."})
@@ -79,9 +75,8 @@ app.get("/api/:username/:password", function(req, res) {
     })
 })
 
-
-//Handle all other routes and return the main index.html file
-app.get("/", (req, res) => res.sendFile(path.join(__dirname, "client/build/index.html")));
+//Handle all other routes and return the login/create account page
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "sign-in-page/build/index.html")));
 
 //Listen for requests on port 3000
 const PORT = process.env.PORT || 3000;
