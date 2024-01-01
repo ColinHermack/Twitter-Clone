@@ -39,7 +39,13 @@ app.post("/api/create-account", function(req, res) {
                     if (error) {
                         res.json({ error: "Could not hash password"});
                     } else {
-                        database.run(`INSERT INTO Users VALUES('${req.body.username}', '${hash}', '${req.body.bio}', '${req.body.photo}');`);
+                        //Generate unique user ID made up of 64 random characters
+                        let identifier = []
+                        for (let i = 0; i < 64; i++) {
+                            identifier.push(String.fromCharCode(97 + Math.floor(Math.random() * 25)));
+                        }
+                        let uniqueID = identifier.join('');
+                        database.run(`INSERT INTO Users VALUES('${req.body.username}', '${hash}', '${req.body.bio}', '${req.body.photo}', '${uniqueID}');`);
                         res.json({
                             username: req.body.username,
                             profilePicture: req.body.photo,
