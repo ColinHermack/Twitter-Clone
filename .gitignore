@@ -1,1 +1,5 @@
 .env
+.DS_STORE
+sign-in-page/.DS_STORE
+node_modules
+sign-in-page/node_modules
