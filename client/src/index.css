@@ -13,6 +13,14 @@ body {
   background-color: var(--main-bg-color);
 }
 
+input:focus {
+  outline: none;
+}
+
+.warning-label {
+  color: red;
+}
+
 /* Login Page Styling */
 
 #login-container {
@@ -161,6 +169,62 @@ body {
   border-radius: 15px;
 }
 
-#create-account-container #info-container .warning-label {
-  color: red;
+/* Sign In Page Styling */
+#sign-in-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+#sign-in-container #info-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 50%;
+  width: 40%;
+  color: var(--main-accent-color);
+  border: 1px solid var(--main-accent-color);
+  border-radius: 10px;
+  font-size: 0.8em;
+}
+
+#sign-in-container #info-container .input-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: left;
+  width: 80%;
+}
+
+#sign-in-container #info-container .input-container input {
+  background-color: var(--main-bg-color);
+  color: var(--main-accent-color);
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border: 1px solid rgb(120, 120, 120);
+  border-radius: 3px;
+}
+
+#sign-in-container #info-container button {
+  width: 80%;
+  font-size: 1.15em;
+  background-color: var(--main-accent-color);
+  border: 2px solid var(--main-accent-color);
+  border-radius: 25px;
+  padding: 10px;
+}
+
+#sign-in-container #info-container h1 {
+  font-size: 2.5em;
+  width: 80%;
+}
+
+#sign-in-container #info-container button:hover {
+  border: 2px solid var(--main-accent-color);
+  background-color: black;
+  color: var(--main-accent-color);
 }

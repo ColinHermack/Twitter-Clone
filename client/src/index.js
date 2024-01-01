@@ -8,7 +8,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      status: 0,
+      status: "default",
       darkMode: true,
       userInformation: {}
     }
@@ -16,27 +16,26 @@ class App extends React.Component {
     this.createAccountPage = this.createAccountPage.bind(this);
     this.signInPage = this.signInPage.bind(this);
     this.createUser = this.createUser.bind(this);
+    this.signInUser = this.signInUser.bind(this);
   }
 
   render() {
-    if (this.state.status === 0) {
-      return (
-        this.loginPage()
-        );
-    } else if (this.state.status === 1) {
-      return (
-        this.createAccountPage()
-      );
+    if (this.state.status === 'default') {
+      return (this.loginPage());
+    } else if (this.state.status === 'create-account') {
+      return (this.createAccountPage());
+    } else if (this.state.status === 'sign-in') {
+      return (this.signInPage());
     }
     
   }
 
   loginPage() {
     const renderCreateAccount = () => {
-      this.setState({status: 1});
+      this.setState({status: "create-account"});
     }
     const renderSignIn = () => {
-      this.setState({status: 2});
+      this.setState({status: "sign-in"});
     }
     return (
       <div id='login-container'>
@@ -53,7 +52,6 @@ class App extends React.Component {
   }
 
   createUser(username, password, bio, photo) {
-
     //Open a new POST request
     const request = new XMLHttpRequest();
     request.open("POST", "/api/create-account", true)
@@ -70,10 +68,33 @@ class App extends React.Component {
     //Set the onload function
     request.onload = () => {
       this.setState({ userInformation: JSON.parse(request.responseText)});
+      if (this.state.userInformation.error === 'Username already taken.') {
+        document.getElementById('username-input-box').style.border = "1px solid red";
+        document.getElementById('username-warning').innerHTML = 'Username already taken.'
+      }
     }
 
     //Send the request
     request.send(body);
+  }
+
+  signInUser(username, password) {
+    const request = new XMLHttpRequest();
+    request.open("GET", `/api/${username}/${password}`);
+    request.send();
+    
+    request.onload = () => {
+      const json = JSON.parse(request.responseText);
+      if (json.error === 'Incorrect password.') {
+        document.getElementById("password-input-box").style.border = "1px solid red";
+        document.getElementById("password-warning").innerHTML = "Incorrect Password.";
+      } else if (json.error === 'User does not exist.') {
+        document.getElementById("username-input-box").style.border = "1px solid red";
+        document.getElementById("username-warning").innerHTML = "Invalid Username."
+      } else if (json.error === undefined) {
+        this.setState({userInformation: json});
+      }
+    }
   }
 
   createAccountPage() {
@@ -141,7 +162,7 @@ class App extends React.Component {
           <label htmlFor='password-confirm-box' className='warning-label' id='password-confirm-warning'></label>
           <label htmlFor='bio-input-box' className='upper-label'>Bio</label>
           <input type='text' id='bio-input-box' />
-          <label htmlFor='photo-input-box' className='upper-label' >Photo Link</label>
+          <label htmlFor='photo-input-box' className='upper-label'>Photo Link</label>
           <input type='text' id='photo-input-box' />
           <button id='apply-image-button' onClick={updatePhoto}>Apply</button>
           <img src="https://t3.ftcdn.net/jpg/00/64/67/80/360_F_64678017_zUpiZFjj04cnLri7oADnyMH0XBYyQghG.jpg" alt="The user's profile" id='profile-image-preview'></img>
@@ -152,7 +173,57 @@ class App extends React.Component {
   }
 
   signInPage() {
-    
+    const validateUsername = () => {
+      if (document.getElementById("username-input-box").value.length === 0) {
+        document.getElementById("username-warning").innerHTML = "What's your username?";
+        document.getElementById("username-input-box").style.border = "1px solid red";
+      } else if (document.getElementById("username-input-box").value.includes(" ")){
+        document.getElementById("username-warning").innerHTML = "Usernames cannot include spaces."
+        document.getElementById("username-input-box").style.border = "1px solid red";
+      } else {
+        document.getElementById("username-warning").innerHTML = "";
+        document.getElementById("username-input-box").style.border = "1px solid rgb(120, 120, 120)";
+      }
+    }
+
+    const validatePassword = () => {
+      if (document.getElementById("password-input-box").value.length === 0) {
+        document.getElementById("password-warning").innerHTML = "Enter a password.";
+        document.getElementById("password-input-box").style.border = "1px solid red";
+      } else if (document.getElementById("password-input-box").value.includes(" ")) {
+        document.getElementById("password-warning").innerHTML = "Passwords cannot include spaces.";
+        document.getElementById("password-input-box").style.border = "1px solid red";
+      } else {
+        document.getElementById("password-warning").innerHTML = "";
+        document.getElementById("password-input-box").style.border = "1px solid rgb(120, 120, 120)";
+      }
+    }
+
+    const signIn = () => {
+      this.signInUser(
+        document.getElementById("username-input-box").value,
+        document.getElementById("password-input-box").value
+      )
+    }
+
+    return (
+      <div id='sign-in-container'>
+        <div id='info-container'>
+          <h1>Log In</h1>
+          <div id='username-input' className='input-container'>
+            <label htmlFor='username-input-box' className='upper-label'>Username</label>
+            <input type='username' id='username-input-box' onChange={validateUsername}/>
+            <label htmlFor='username-input-box' id='username-warning' className='warning-label'></label>
+          </div>
+          <div id='password-input' className='input-container'>
+            <label htmlFor='password-input-box' className='upper-label'>Password</label>
+            <input type='password' id='password-input-box' onChange={validatePassword}/>
+            <label htmlFor='password-input-box' className='warning-label' id='password-warning'></label>
+          </div>
+          <button id='submit-sign-in' onClick={signIn}>Log In</button>
+        </div>
+      </div>
+    )
   }
 }
 
