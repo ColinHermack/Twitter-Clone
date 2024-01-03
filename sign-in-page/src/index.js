@@ -67,12 +67,13 @@ class App extends React.Component {
 
     //Set the onload function
     request.onload = () => {
-      this.setState({ userInformation: JSON.parse(request.responseText)});
-      if (this.userInformation.error === 'Username already taken.') {
+      const json = JSON.parse(request.responseText);
+      if (json.error === 'Username already taken.') {
         document.getElementById('username-input-box').style.border = "1px solid red";
         document.getElementById('username-warning').innerHTML = 'Username already taken.'
-      } else if (this.state.userInformation.error === undefined) {
+      } else if (json.error === undefined) {
         document.cookie = `id=${this.state.userInformation.id}`;
+        this.setState({userInformation: json});
       }
     }
 

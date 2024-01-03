@@ -65,10 +65,12 @@ app.get("/api/:username/:password", function(req, res) {
         } 
         bcrypt.compare(req.params.password, row.password, (err, result) => {
             if (result) {
+                console.log("Login successful");
                 res.send({ 
                     id: row.id
                 })
             } else {
+                console.log("Login Attempt failed - incorrect password. Sending error message.");
                 res.send({ error: "Incorrect Password."})
             }
         })
