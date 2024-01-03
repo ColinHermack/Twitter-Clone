@@ -4,6 +4,8 @@ const bodyParser = require("body-parser");
 const sqlite3 = require("sqlite3");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
+require("dotenv").config();
+const https = require('https');
 
 const app = express();
 
@@ -56,7 +58,7 @@ app.post("/api/create-account", function(req, res) {
     }
 });
 
-//Handle sign in with GET requests on the /api path
+//Handle sign in with GET requests on the /api/signIn path
 app.get("/api/signIn:username/:password", function(req, res) {
     database.get("SELECT * FROM Users WHERE username = '" + req.params.username + "';", (error, row) => {
         if (row === undefined) {
@@ -77,7 +79,42 @@ app.get("/api/signIn:username/:password", function(req, res) {
     })
 })
 
-//Get a user's feed
+//Handle requests for a users homepage feed on the /api/feed path
+app.get("/api/feed/:id", function (req, res) {
+    
+
+    feedObject = {
+        headlines: []
+    };
+    const options = {
+        host: 'newsapi.org',
+        path: `/v2/top-headlines?country=us&apiKey=${process.env.NEWS_API_KEY}`,
+        headers: {
+            'User-Agent': req.get('user-agent')
+        }
+    }
+    https.get(options, (resp) => {
+        let data = '';
+        resp.on('data', (chunk) => {
+            data += chunk;
+        })
+
+        resp.on('end', () => {
+            let json = JSON.parse(data);
+            if (json.status !== 'error') {
+                for (let i = 0; i < 5; i++) {
+                    feedObject.headlines.push({
+                        'title': json['articles'][i]['title'],
+                        'url': json['articles'][i]['url'],
+                        'image': json['articles'][i]['urlToImage'],
+                    })
+                }
+                console.log(feedObject);
+            }
+            
+        })
+    })
+})
 
 //Handle all other routes and serve the main React component
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "client/build/index.html")));
