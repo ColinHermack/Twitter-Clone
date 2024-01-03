@@ -81,9 +81,14 @@ app.get("/api/signIn:username/:password", function(req, res) {
 
 //Handle requests for a users homepage feed on the /api/feed path
 app.get("/api/feed/:id", function (req, res) {
-    
-
-    feedObject = {
+    //Check whether the user exists
+    database.get("SELECT * FROM Users WHERE id = '" + req.params.id + "';", (error, row) => {
+        if (row === undefined) {
+            res.send({ error: "User does not exist."})
+            return;
+        } 
+    });
+    let feedObject = {
         headlines: []
     };
     const options = {
@@ -109,8 +114,8 @@ app.get("/api/feed/:id", function (req, res) {
                         'image': json['articles'][i]['urlToImage'],
                     })
                 }
-                console.log(feedObject);
             }
+            res.send(feedObject);
             
         })
     })
