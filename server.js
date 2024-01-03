@@ -10,7 +10,7 @@ const app = express();
 //Connect to database
 const database = new sqlite3.Database('./database.db');
 
-app.use(express.static(path.join(__dirname, 'sign-in-page/build')));  //Serve static files from the build folder
+app.use(express.static(path.join(__dirname, 'client/build')));  //Serve static files from the build folder for the sign in page
 app.use(bodyParser.urlencoded({ extended: false }));  //Use bodyParser for URL-encoded bodies
 app.use(bodyParser.json());  //Use bodyParser for JSON-encoded bodies
 app.use(cors(
@@ -57,7 +57,7 @@ app.post("/api/create-account", function(req, res) {
 });
 
 //Handle sign in with GET requests on the /api path
-app.get("/api/:username/:password", function(req, res) {
+app.get("/api/signIn:username/:password", function(req, res) {
     database.get("SELECT * FROM Users WHERE username = '" + req.params.username + "';", (error, row) => {
         if (row === undefined) {
             res.send({ error: "User does not exist."})
@@ -77,8 +77,11 @@ app.get("/api/:username/:password", function(req, res) {
     })
 })
 
-//Handle all other routes and return the login/create account page
-app.get("/", (req, res) => res.sendFile(path.join(__dirname, "sign-in-page/build/index.html")));
+//Get a user's feed
+
+//Handle all other routes and serve the main React component
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "client/build/index.html")));
+app.get("/home/:id", (req, res) => res.sendFile(path.join(__dirname, "client/build/index.html")));
 
 //Listen for requests on port 3000
 const PORT = process.env.PORT || 3000;

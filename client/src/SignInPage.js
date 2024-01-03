@@ -1,22 +1,33 @@
 import React from 'react';
-import ReactDOM  from 'react-dom/client';
 import './index.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFeather } from '@fortawesome/free-solid-svg-icons';
 
-class App extends React.Component {
+class SignInPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       status: "default",
       darkMode: true,
-      userInformation: {}
     }
     this.loginPage = this.loginPage.bind(this);
     this.createAccountPage = this.createAccountPage.bind(this);
     this.signInPage = this.signInPage.bind(this);
     this.createUser = this.createUser.bind(this);
     this.signInUser = this.signInUser.bind(this);
+  }
+
+  componentDidMount() {
+    let cookieStrings = decodeURIComponent(document.cookie).split(";");
+    let cookies = {};
+    for (let i = 0; i < cookieStrings.length; i++) {
+      cookieStrings[i] = cookieStrings[i].split("=");
+      cookies[cookieStrings[i][0]] = cookieStrings[i][1];
+    }
+    if (cookies.id !== undefined) {
+      window.location.replace(`/home/${cookies.id}`);
+    }
+
   }
 
   render() {
@@ -68,12 +79,13 @@ class App extends React.Component {
     //Set the onload function
     request.onload = () => {
       const json = JSON.parse(request.responseText);
+      console.log(json);
       if (json.error === 'Username already taken.') {
         document.getElementById('username-input-box').style.border = "1px solid red";
         document.getElementById('username-warning').innerHTML = 'Username already taken.'
       } else if (json.error === undefined) {
-        document.cookie = `id=${this.state.userInformation.id}`;
-        this.setState({userInformation: json});
+        document.cookie = `id=${json.id}`;
+        window.location.replace(`/home/${json.id}`);
       }
     }
 
@@ -83,20 +95,19 @@ class App extends React.Component {
 
   signInUser(username, password) {
     const request = new XMLHttpRequest();
-    request.open("GET", `/api/${username}/${password}`);
+    request.open("GET", `/api/signIn/${username}/${password}`);
     request.send();
     
     request.onload = () => {
       const json = JSON.parse(request.responseText);
-      if (json.error === 'Incorrect password.') {
+      if (json.error === 'Incorrect Password.') {
         document.getElementById("password-input-box").style.border = "1px solid red";
         document.getElementById("password-warning").innerHTML = "Incorrect Password.";
       } else if (json.error === 'User does not exist.') {
         document.getElementById("username-input-box").style.border = "1px solid red";
         document.getElementById("username-warning").innerHTML = "Invalid Username."
       } else if (json.error === undefined) {
-        this.setState({userInformation: json});
-        document.cookie = `id=${this.state.userInformation.id}`;
+        window.location.replace(`/home/${json.id}`);
       }
     }
   }
@@ -106,12 +117,15 @@ class App extends React.Component {
       if (document.getElementById("username-input-box").value.length === 0) {
         document.getElementById("username-warning").innerHTML = "What's your username?";
         document.getElementById("username-input-box").style.border = "1px solid red";
+        return false;
       } else if (document.getElementById("username-input-box").value.includes(" ")){
         document.getElementById("username-warning").innerHTML = "Usernames cannot include spaces."
         document.getElementById("username-input-box").style.border = "1px solid red";
+        return false;
       } else {
         document.getElementById("username-warning").innerHTML = "";
         document.getElementById("username-input-box").style.border = "1px solid rgb(120, 120, 120)";
+        return true;
       }
     }
 
@@ -119,9 +133,11 @@ class App extends React.Component {
       if (document.getElementById("password-input-box").value.length === 0) {
         document.getElementById("password-warning").innerHTML = "Enter a password.";
         document.getElementById("password-input-box").style.border = "1px solid red";
+        return false;
       } else if (document.getElementById("password-input-box").value.includes(" ")) {
         document.getElementById("password-warning").innerHTML = "Passwords cannot include spaces.";
         document.getElementById("password-input-box").style.border = "1px solid red";
+        return false;
       } else {
         document.getElementById("password-warning").innerHTML = "";
         document.getElementById("password-input-box").style.border = "1px solid rgb(120, 120, 120)";
@@ -130,10 +146,12 @@ class App extends React.Component {
       if (document.getElementById("password-confirm-box").value !== document.getElementById("password-input-box").value) {
         document.getElementById("password-confirm-warning").innerHTML = "Passwords do not match."
         document.getElementById("password-confirm-box").style.border = "1px solid red";
+        return false;
       } else {
         document.getElementById("password-confirm-warning").innerHTML = "";
         document.getElementById("password-confirm-box").style.border = "1px solid rgb(120, 120, 120)";
       }
+      return true;
     }
 
     const updatePhoto = () => {
@@ -141,14 +159,14 @@ class App extends React.Component {
     }
 
     const createAccount = () => {
-      validateUsername();
-      validatePassword();
-      this.createUser(
-        document.getElementById('username-input-box').value,
-        document.getElementById('password-input-box').value,
-        document.getElementById('bio-input-box').value,
-        document.getElementById('photo-input-box').value
-      )
+      if (validateUsername() && validatePassword()) {
+        this.createUser(
+          document.getElementById('username-input-box').value,
+          document.getElementById('password-input-box').value,
+          document.getElementById('bio-input-box').value,
+          document.getElementById('photo-input-box').value
+        )
+      }
     }
 
     return (
@@ -181,12 +199,15 @@ class App extends React.Component {
       if (document.getElementById("username-input-box").value.length === 0) {
         document.getElementById("username-warning").innerHTML = "What's your username?";
         document.getElementById("username-input-box").style.border = "1px solid red";
+        return false;
       } else if (document.getElementById("username-input-box").value.includes(" ")){
         document.getElementById("username-warning").innerHTML = "Usernames cannot include spaces."
         document.getElementById("username-input-box").style.border = "1px solid red";
+        return false;
       } else {
         document.getElementById("username-warning").innerHTML = "";
         document.getElementById("username-input-box").style.border = "1px solid rgb(120, 120, 120)";
+        return true;
       }
     }
 
@@ -194,20 +215,25 @@ class App extends React.Component {
       if (document.getElementById("password-input-box").value.length === 0) {
         document.getElementById("password-warning").innerHTML = "Enter a password.";
         document.getElementById("password-input-box").style.border = "1px solid red";
+        return false;
       } else if (document.getElementById("password-input-box").value.includes(" ")) {
         document.getElementById("password-warning").innerHTML = "Passwords cannot include spaces.";
         document.getElementById("password-input-box").style.border = "1px solid red";
+        return false;
       } else {
         document.getElementById("password-warning").innerHTML = "";
         document.getElementById("password-input-box").style.border = "1px solid rgb(120, 120, 120)";
+        return true;
       }
     }
 
     const signIn = () => {
-      this.signInUser(
-        document.getElementById("username-input-box").value,
-        document.getElementById("password-input-box").value
-      )
+      if (validateUsername() && validatePassword()) {
+        this.signInUser(
+          document.getElementById("username-input-box").value,
+          document.getElementById("password-input-box").value
+        )
+      }
     }
 
     return (
@@ -231,9 +257,4 @@ class App extends React.Component {
   }
 }
 
-const root = ReactDOM.createRoot(document.getElementById('sign-in-root'))
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-)
+export default SignInPage;
