@@ -2,6 +2,7 @@ import React from 'react';
 import './home.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFeather, faHouse, faMagnifyingGlass, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import defaultProfile from './default-profile.png';
 
 class Home extends React.Component {
     constructor(props) {
@@ -15,22 +16,30 @@ class Home extends React.Component {
     componentDidMount() {
         //Get the current path and split into an array
         const currentPath = (window.location.pathname).split('/');
-
-        //Get the feed from the server
-        const request = new XMLHttpRequest();
-        request.open("GET", `/api/feed/${currentPath[currentPath.length - 1]}`);
-        
-        request.onload = () => {
-            if (JSON.parse(request.responseText).error === 'User does not exist.') {
-                document.cookie = "id=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
-                window.location.replace('/');
+        try {
+            const request = new XMLHttpRequest();
+            request.open("GET", `/api/feed/${currentPath[currentPath.length - 1]}`);
+            
+            request.onload = () => {
+                if (!request.responseText.includes("Proxy error")) {
+                    if (JSON.parse(request.responseText).error === 'User does not exist.') {
+                        document.cookie = "id=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+                        window.location.replace('/');
+                    }
+                    this.setState({
+                        feed: JSON.parse(request.responseText)
+                    })
+                }
+                
             }
-            this.setState({
-                feed: JSON.parse(request.responseText)
-            })
-        }
+            request.send();
 
-        request.send();
+        } catch(err) {
+            //Do nothing and just load the blank page
+        }
+        //Get the feed from the server
+        
+
 
     }
 
@@ -60,7 +69,7 @@ class Home extends React.Component {
                 <button className='navbar-button'><FontAwesomeIcon icon={faHouse} /></button>
                 <button className='navbar-button'><FontAwesomeIcon icon={faMagnifyingGlass} /></button>
                 <button className='navbar-button'><FontAwesomeIcon icon={faEnvelope} /></button>
-                <button className='navbar-button'><img src={undefined} alt="user's profile" className='navbar-item'/></button>
+                <button className='navbar-button'><img src={defaultProfile} alt="user's profile" className='navbar-item'/></button>
                 <div className='divider navbar-item'></div>
             </nav>
             <div id='top-menu'><FontAwesomeIcon icon={faFeather} id='top-menu-logo' /></div>

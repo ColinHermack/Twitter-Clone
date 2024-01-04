@@ -99,6 +99,7 @@ class SignInPage extends React.Component {
     request.send();
     
     request.onload = () => {
+      console.log(request.responseText);
       const json = JSON.parse(request.responseText);
       if (json.error === 'Incorrect Password.') {
         document.getElementById("password-input-box").style.border = "1px solid red";
