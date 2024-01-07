@@ -56,7 +56,7 @@ a {
     }
 
     .divider {
-        width: 100%;
+        width: 90%;
         height: 0.5px;
         background-color: rgb(70, 70, 70);
     }
@@ -158,6 +158,8 @@ a {
         border-radius: 50%;
     }
 
+    /* News headlines styling */
+
     .headline-container {
         width: 450px;
         margin-left: 5%;
@@ -211,6 +213,165 @@ a {
         to {
             background-color: var(--main-bg-color);
         }
+    }
+
+    /* New post screen styling */
+    #new-post-container {
+        width: 100vw;
+        height: 100vh;
+        position: absolute;
+        left: 0;
+        top: 0;
+        background-color: rgb(70, 70, 70, 0.5);
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: top;
+    }
+
+    #new-post-input-container {
+        width: 30%;
+        height: fit-content;
+        background-color: var(--main-bg-color);
+        border-radius: 10px;
+        margin-top: 10%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: left;
+        color: var(--main-accent-color);
+    }
+
+    #new-post-input-container img {
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+    }
+
+    #new-post-close {
+        background-color: var(--main-bg-color);
+        border: none;
+        color: var(--main-accent-color);
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        margin-left: 5px;
+        margin-top: 5px;
+        font-size: 1em;
+        animation-name: new-post-close-normal;
+        animation-duration: 0.25s;
+        margin-bottom: 20px;
+
+    }
+
+    #new-post-close:hover {
+        background-color: var(--highlight-color);
+        animation-name: new-post-close-hover;
+        animation-duration: 0.25s;
+    }
+
+    @keyframes new-post-close-hover {
+        from {
+            background-color: var(--main-bg-color);
+        }
+        to {
+            background-color: var(--highlight-color);
+        }
+    }
+
+    @keyframes new-post-close-normal {
+        from {
+            background-color: var(--highlight-color);
+        }
+        to {
+            background-color: var(--main-bg-color);
+        }
+    }
+
+    .new-post-section {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: top;
+        width: 90%;
+        margin-left: 5%;
+    }
+
+    #new-post-input-box {
+        resize: none;
+        border: none;
+        background-color: var(--main-bg-color);
+        color: var(--main-accent-color);
+        font-size: 1em;
+        margin-top: 10px;
+        margin-left: 10px;
+        width: calc(100% - 50px);
+        height: 120px;
+    }
+
+    #new-post-input-box:focus {
+        outline: none;
+    }
+
+    #new-post-input-container #input-upper img {
+        height: 40px;
+        width: 40px;
+    }
+
+    #new-post-button {
+        background-color: var(--main-accent-color);
+        border: 2px solid var(--main-accent-color);
+        color: var(--main-bg-color);
+        margin-top: 15px;
+        margin-bottom: 15px;
+        font-size: 1em;
+        font-weight: 600;
+        border-radius: 25px;
+        padding: 9px 15px 9px 15px;
+        animation-name: new-post-button-normal;
+        animation-duration: 0.25s;
+    }
+
+    #new-post-button:hover {
+        background-color: var(--main-bg-color);
+        color: var(--main-accent-color);
+        animation-name: new-post-button-hover;
+        animation-duration: 0.25s;
+    }
+
+    @keyframes new-post-button-hover {
+        from {
+            background-color: var(--main-accent-color);
+            color: var(--main-bg-color);
+        }
+        to {
+            background-color: var(--main-bg-color);
+            color: var(--main-accent-color);
+        }
+    }
+
+    @keyframes new-post-button-normal {
+        from {
+            background-color: var(--main-bg-color);
+            color: var(--main-accent-color);
+        } 
+        to {
+            background-color: var(--main-accent-color);
+            color: var(--main-bg-color);
+        }
+    }
+
+    #characters-remaining {
+        margin-top: 15px;
+        font-size: 1em;
+        color: rgb(70, 70, 70);
+        width: 35px;
+        height: 35px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
     }
 
 }
@@ -296,5 +457,4 @@ a {
         border: none;
         background-color: var(--main-accent-color);
     }
-
 }

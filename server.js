@@ -8,6 +8,7 @@ require("dotenv").config();  //Hiding API keys
 const https = require('https');  //Making API requests server-side
 
 const app = express();
+const date = new Date();
 
 //Connect to database
 const database = new sqlite3.Database('./database.db');
@@ -102,6 +103,12 @@ app.get("/api/signIn/:username/:password", function(req, res) {
 
 //Handle requests for a user's homepage feed on the /api/feed path
 app.get("/api/feed/:id", function (req, res) {
+    //Create an object to respond with
+    let feedObject = {
+        headlines: [],
+        posts: []
+    };
+
     //Check whether the user exists
     database.get("SELECT * FROM Users WHERE id = '" + req.params.id + "';", (error, row) => {
         if (error) {
@@ -110,13 +117,22 @@ app.get("/api/feed/:id", function (req, res) {
         if (row === undefined) {
             res.send({ error: "User does not exist."})
             return;
-        } 
+        } else {
+            feedObject.profilePicture = row.photo;
+        }
     });
 
-    //Create an object to respond with
-    let feedObject = {
-        headlines: []
-    };
+    //Get the first 25 posts from the posts table
+    database.each("SELECT * FROM Posts LIMIT 25;", (error, row) => {
+        feedObject.posts.push({
+            author: row.author,
+            content: row.content,
+            likes: row.likes,
+            timestamp: `${row.hour}:${row.minute} • ${row.month}-${row.day}-${row.year}`
+        })
+    })
+
+    
 
     //Set options for news API call
     const options = {
@@ -154,6 +170,28 @@ app.get("/api/feed/:id", function (req, res) {
             
         })
     })
+})
+
+//Add new posts to the database
+app.post("/api/new-post", function(req, res) {
+    console.log("Adding new post...");
+    
+    //Generate a random post id
+    let identifier = []
+    for (let i = 0; i < 64; i++) {
+        identifier.push(String.fromCharCode(97 + Math.floor(Math.random() * 25)));
+    }
+    
+    //Find the author of the post based on their id
+    database.get(`SELECT * FROM Users WHERE id = '${req.body.author}';`, (error, row) => {
+        let author = row.username;
+
+        //Add the post to the database
+        database.run(`INSERT INTO Posts Values('${author}', "${req.body.content}", 0, ${date.getFullYear()}, ${date.getMonth() + 1}, ${date.getDate()}, ${date.getHours()}, ${date.getMinutes()}, '${identifier.join('')}');`)
+        res.json({message: "received"});
+    })
+
+    
 })
 
 //Handle all other routes and serve the main React component
